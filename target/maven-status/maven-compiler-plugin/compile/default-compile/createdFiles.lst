@@ -1,0 +1,8 @@
+com\wfm\controller\AdminController.class
+com\wfm\util\DatabaseConnector.class
+com\wfm\model\User.class
+com\wfm\controller\LogoutController.class
+com\wfm\controller\TestServlet.class
+com\wfm\dao\UserDao.class
+com\wfm\controller\TechnicianController.class
+com\wfm\controller\LoginController.class

@@ -1,0 +1,9 @@
+{
+    "java.project.sourcePaths": [
+        "src/main/java"
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "maven.terminal.useJavaHome": true,
+    "maven.executable.options": "--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
+}
