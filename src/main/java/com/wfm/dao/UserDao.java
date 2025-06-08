@@ -27,7 +27,7 @@ public class UserDao {
                     user.setUsername(rs.getString("username"));
                     user.setPassword(rs.getString("password"));
                     user.setStatus(rs.getString("status"));
-                    user.setWa(rs.getString("wa"));
+                    user.setWhatsapp(rs.getString("whatsapp"));
                     user.setRole(rs.getString("role"));
                     return user;
                 }
@@ -53,7 +53,7 @@ public class UserDao {
                     user.setUsername(rs.getString("username"));
                     user.setPassword(rs.getString("password"));
                     user.setStatus(rs.getString("status"));
-                    user.setWa(rs.getString("wa"));
+                    user.setWhatsapp(rs.getString("whatsapp"));
                     user.setRole(rs.getString("role"));
                     return user;
                 }
@@ -68,18 +68,18 @@ public class UserDao {
     // Method untuk mendapatkan semua user
     public static List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM users ORDER BY id";
+        String query = "SELECT * FROM users";
 
         try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
                     User user = new User();
                     user.setId(rs.getInt("id"));
                     user.setUsername(rs.getString("username"));
                     user.setPassword(rs.getString("password"));
                     user.setStatus(rs.getString("status"));
-                    user.setWa(rs.getString("wa"));
+                    user.setWhatsapp(rs.getString("whatsapp"));
                     user.setRole(rs.getString("role"));
                     users.add(user);
                 }
@@ -106,7 +106,7 @@ public class UserDao {
                     user.setUsername(rs.getString("username"));
                     user.setPassword(rs.getString("password"));
                     user.setStatus(rs.getString("status"));
-                    user.setWa(rs.getString("wa"));
+                    user.setWhatsapp(rs.getString("whatsapp"));
                     user.setRole(rs.getString("role"));
                     return user;
                 }
