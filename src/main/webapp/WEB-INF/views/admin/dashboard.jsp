@@ -1,9 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
-prefix="c" uri="jakarta.tags.core" %>
-
+prefix="c" uri="jakarta.tags.core" %> <%@ taglib prefix="fn"
+uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html lang="id">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Work Flow Management</title>
@@ -28,7 +28,12 @@ prefix="c" uri="jakarta.tags.core" %>
 
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+        background: linear-gradient(
+          135deg,
+          #0c0c0c 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
         min-height: 100vh;
         color: rgba(255, 255, 255, 0.9);
         position: relative;
@@ -63,9 +68,16 @@ prefix="c" uri="jakarta.tags.core" %>
       }
 
       @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        33% { transform: translateY(-30px) rotate(0.5deg); }
-        66% { transform: translateY(20px) rotate(-0.5deg); }
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        33% {
+          transform: translateY(-30px) rotate(0.5deg);
+        }
+        66% {
+          transform: translateY(20px) rotate(-0.5deg);
+        }
       }
 
       /* Floating shapes */
@@ -118,10 +130,19 @@ prefix="c" uri="jakarta.tags.core" %>
       }
 
       @keyframes floatShapes {
-        0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
-        25% { transform: translateY(-20px) translateX(10px) rotate(90deg); }
-        50% { transform: translateY(20px) translateX(-10px) rotate(180deg); }
-        75% { transform: translateY(-10px) translateX(20px) rotate(270deg); }
+        0%,
+        100% {
+          transform: translateY(0px) translateX(0px) rotate(0deg);
+        }
+        25% {
+          transform: translateY(-20px) translateX(10px) rotate(90deg);
+        }
+        50% {
+          transform: translateY(20px) translateX(-10px) rotate(180deg);
+        }
+        75% {
+          transform: translateY(-10px) translateX(20px) rotate(270deg);
+        }
       }
 
       /* Glassmorphism Components */
@@ -148,7 +169,12 @@ prefix="c" uri="jakarta.tags.core" %>
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.1), transparent);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(100, 255, 218, 0.1),
+          transparent
+        );
         transition: left 0.5s;
         z-index: 0;
       }
@@ -236,7 +262,12 @@ prefix="c" uri="jakarta.tags.core" %>
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #64ffda 0%, #1de9b6 50%, #00bcd4 100%);
+        background: linear-gradient(
+          135deg,
+          #64ffda 0%,
+          #1de9b6 50%,
+          #00bcd4 100%
+        );
         transition: left 0.3s ease;
         z-index: -1;
       }
@@ -265,7 +296,10 @@ prefix="c" uri="jakarta.tags.core" %>
         margin-left: 280px;
         padding-top: 80px;
         min-height: 100vh;
+        width: calc(100vw - 280px); /* Viewport width minus sidebar width */
+        max-width: calc(100vw - 280px);
         transition: all 0.3s ease;
+        box-sizing: border-box;
       }
 
       .content-wrapper {
@@ -274,7 +308,12 @@ prefix="c" uri="jakarta.tags.core" %>
 
       /* Cards */
       .welcome-card {
-        background: linear-gradient(135deg, #64ffda 0%, #1de9b6 50%, #00bcd4 100%);
+        background: linear-gradient(
+          135deg,
+          #64ffda 0%,
+          #1de9b6 50%,
+          #00bcd4 100%
+        );
         color: #0c0c0c;
         border-radius: 20px;
         padding: 2rem;
@@ -292,13 +331,21 @@ prefix="c" uri="jakarta.tags.core" %>
         right: -50%;
         width: 200%;
         height: 200%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
         animation: rotate 20s linear infinite;
       }
 
       @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
 
       .info-card {
@@ -350,7 +397,12 @@ prefix="c" uri="jakarta.tags.core" %>
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.1), transparent);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(100, 255, 218, 0.1),
+          transparent
+        );
         transition: left 0.5s;
       }
 
@@ -400,7 +452,12 @@ prefix="c" uri="jakarta.tags.core" %>
       }
 
       .table thead th {
-        background: linear-gradient(135deg, #64ffda 0%, #1de9b6 50%, #00bcd4 100%);
+        background: linear-gradient(
+          135deg,
+          #64ffda 0%,
+          #1de9b6 50%,
+          #00bcd4 100%
+        );
         color: #0c0c0c;
         border: none;
         font-weight: 600;
@@ -568,537 +625,623 @@ prefix="c" uri="jakarta.tags.core" %>
         background: rgba(100, 255, 218, 0.5);
       }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Floating Shapes -->
     <div class="floating-shapes">
       <div class="shape"></div>
       <div class="shape"></div>
       <div class="shape"></div>
       <div class="shape"></div>
-  </div>
+    </div>
 
-  <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
-          <div class="d-flex align-items-center">
-              <button class="sidebar-toggle me-3" onclick="toggleSidebar()">
-                  <i class="fas fa-bars"></i>
-              </button>
-              <span class="navbar-brand mb-0">
-                  <i class="fas fa-chart-line"></i>
-                  Work Flow Management
-              </span>
-          </div>
-          <div class="d-flex align-items-center">
-              <span class="me-3" style="color: rgba(255, 255, 255, 0.8);">
-                  <i class="fas fa-user-circle me-2" style="color: #64ffda;"></i>
-                  Admin User
-              </span>
-              <button class="btn btn-logout">
-                  <i class="fas fa-sign-out-alt me-2"></i>Logout
-              </button>
-          </div>
+        <div class="d-flex align-items-center">
+          <button class="sidebar-toggle me-3" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+          </button>
+          <span class="navbar-brand mb-0">
+            <i class="fas fa-chart-line"></i>
+            Work Flow Management
+          </span>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="me-3" style="color: rgba(255, 255, 255, 0.8)">
+            <i class="fas fa-user-circle me-2" style="color: #64ffda"></i>
+            Admin User
+          </span>
+          <button class="btn btn-logout">
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+          </button>
+        </div>
       </div>
-  </nav>
+    </nav>
 
-  <div class="d-flex">
+    <div class="d-flex">
       <!-- Sidebar -->
       <div class="sidebar" id="sidebar">
-          <ul class="sidebar-menu">
-              <li>
-                  <a href="#dashboard" class="active" onclick="showSection('dashboard')">
-                      <i class="fas fa-tachometer-alt"></i>
-                      Dashboard
-                  </a>
-              </li>
-              <li>
-                  <a href="#history" onclick="showSection('history')">
-                      <i class="fas fa-history"></i>
-                      History
-                  </a>
-              </li>
-              <li>
-                  <a href="#ticket" onclick="showSection('ticket')">
-                      <i class="fas fa-ticket-alt"></i>
-                      Ticket
-                  </a>
-              </li>
-              <li>
-                  <a href="#technician" onclick="showSection('technician')">
-                      <i class="fas fa-tools"></i>
-                      Technician
-                  </a>
-              </li>
-          </ul>
+        <ul class="sidebar-menu">
+          <li>
+            <a
+              href="#dashboard"
+              class="active"
+              onclick="showSection('dashboard')"
+            >
+              <i class="fas fa-tachometer-alt"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="#history" onclick="showSection('history')">
+              <i class="fas fa-history"></i>
+              History
+            </a>
+          </li>
+          <li>
+            <a href="#ticket" onclick="showSection('ticket')">
+              <i class="fas fa-ticket-alt"></i>
+              Ticket
+            </a>
+          </li>
+          <li>
+            <a href="#technician" onclick="showSection('technician')">
+              <i class="fas fa-tools"></i>
+              Technician
+            </a>
+          </li>
+        </ul>
       </div>
 
       <!-- Main Content -->
       <div class="main-content">
-          <div class="content-wrapper">
-              <!-- Dashboard Section -->
-              <div id="dashboard-section" class="content-section">
-                  <!-- Welcome Card -->
-                  <div class="welcome-card">
-                      <div class="row align-items-center">
-                          <div class="col-md-8">
-                              <h3 class="mb-2" style="position: relative; z-index: 1;">
-                                  <i class="fas fa-hand-wave me-2"></i>
-                                  Selamat datang, Admin ${user.username}!
-                              </h3>
-                              <p class="mb-2" style="position: relative; z-index: 1;">
-                                  Anda login sebagai
-                                  <span class="badge" style="background: rgba(12, 12, 12, 0.8); color: #64ffda;">Admin</span>
-                              </p>
-                              <p class="mb-0" style="position: relative; z-index: 1;">
-                                  Status:
-                                  <span class="badge" style="background: rgba(12, 12, 12, 0.8); color: #1de9b6;">${user.status}</span>
-                              </p>
-                          </div>
-                          <div class="col-md-4 text-end">
-                              <div class="user-avatar mx-auto" style="width: 80px; height: 80px; font-size: 2rem; position: relative; z-index: 1;">
-                                  A
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-
-                  <!-- Stats Row -->
-                  <div class="row mb-4">
-                      <div class="col-md-3 col-sm-6 mb-3">
-                          <div class="stats-card glass-hover">
-                              <i class="fas fa-users stats-icon"></i>
-                              <div class="stats-number">24</div>
-                              <div class="stats-label">Total Users</div>
-                          </div>
-                      </div>
-                      <div class="col-md-3 col-sm-6 mb-3">
-                          <div class="stats-card glass-hover">
-                              <i class="fas fa-ticket-alt stats-icon"></i>
-                              <div class="stats-number">48</div>
-                              <div class="stats-label">Active Tickets</div>
-                          </div>
-                      </div>
-                      <div class="col-md-3 col-sm-6 mb-3">
-                          <div class="stats-card glass-hover">
-                              <i class="fas fa-tools stats-icon"></i>
-                              <div class="stats-number">12</div>
-                              <div class="stats-label">Technicians</div>
-                          </div>
-                      </div>
-                      <div class="col-md-3 col-sm-6 mb-3">
-                          <div class="stats-card glass-hover">
-                              <i class="fas fa-check-circle stats-icon"></i>
-                              <div class="stats-number">156</div>
-                              <div class="stats-label">Completed</div>
-                          </div>
-                      </div>
-                  </div>
-
-                  <!-- User Info Card -->
-                  <div class="info-card glass-hover">
-                      <div class="card-header">
-                          <h5 class="mb-0" style="color: rgba(255, 255, 255, 0.9);">
-                              <i class="fas fa-info-circle me-2"></i>
-                              Informasi Akun
-                          </h5>
-                      </div>
-                      <div class="card-body">
-                          <div class="row">
-                              <div class="col-md-6">
-                                  <p><strong>ID:</strong> <code style="color: #64ffda;">${user.id}</code></p>
-                                  <p><strong>Username:</strong> ${user.username}</p>
-                                  <p class="mb-0">
-                                      <strong>Role:</strong>
-                                      <span class="badge bg-danger">${user.role}</span>
-                                  </p>
-                              </div>
-                              <div class="col-md-6">
-                                  <p>
-                                      <strong>Status:</strong>
-                                      <span class="badge bg-success">${user.status}</span>
-                                  </p>
-                                  <p class="mb-0">
-                                      <strong>WhatsApp:</strong>
-                                      <a href="https://wa.me/628123456789" class="wa-link" target="_blank">
-                                          <i class="fab fa-whatsapp me-1"></i>
-                                          +62 812-3456-789
-                                      </a>
-                                  </p>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-
-                  <!-- Users Table -->
-                  <div class="table-glass">
-                      <div class="card-header">
-                          <h5 class="mb-0" style="color: #0c0c0c;">
-                              <i class="fas fa-users me-2"></i>
-                              Daftar Semua User
-                          </h5>
-                      </div>
-                      <div class="table-responsive">
-                          <table class="table">
-                              <thead>
-                                  <tr>
-                                      <th>Avatar</th>
-                                      <th>Username</th>
-                                      <th>Role</th>
-                                      <th>Status</th>
-                                      <th>WhatsApp</th>
-                                      <th>ID</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <tr>
-                                      <td><div class="user-avatar">A</div></td>
-                                      <td><strong>Admin User</strong></td>
-                                      <td><span class="badge bg-danger">admin</span></td>
-                                      <td><span class="badge bg-success">Active</span></td>
-                                      <td>
-                                          <a href="https://wa.me/628123456789" class="wa-link" target="_blank">
-                                              <i class="fab fa-whatsapp me-1"></i>
-                                              +62 812-3456-789
-                                          </a>
-                                      </td>
-                                      <td><code style="color: #64ffda;">user:12345</code></td>
-                                  </tr>
-                                  <tr>
-                                      <td><div class="user-avatar">J</div></td>
-                                      <td><strong>john_doe</strong></td>
-                                      <td><span class="badge bg-primary">user</span></td>
-                                      <td><span class="badge bg-success">Active</span></td>
-                                      <td>
-                                          <a href="https://wa.me/628987654321" class="wa-link" target="_blank">
-                                              <i class="fab fa-whatsapp me-1"></i>
-                                              +62 898-7654-321
-                                          </a>
-                                      </td>
-                                      <td><code style="color: #64ffda;">user:67890</code></td>
-                                  </tr>
-                                  <tr>
-                                      <td><div class="user-avatar">M</div></td>
-                                      <td><strong>maria_santos</strong></td>
-                                      <td><span class="badge bg-primary">user</span></td>
-                                      <td><span class="badge bg-success">Active</span></td>
-                                      <td><span class="text-muted">-</span></td>
-                                      <td><code style="color: #64ffda;">user:54321</code></td>
-                                  </tr>
-                                  <tr>
-                                      <td><div class="user-avatar">D</div></td>
-                                      <td><strong>developer_x</strong></td>
-                                      <td><span class="badge bg-danger">admin</span></td>
-                                      <td><span class="badge bg-success">Active</span></td>
-                                      <td>
-                                          <a href="https://wa.me/628555666777" class="wa-link" target="_blank">
-                                              <i class="fab fa-whatsapp me-1"></i>
-                                              +62 855-5666-777
-                                          </a>
-                                      </td>
-                                      <td><code style="color: #64ffda;">user:11111</code></td>
-                                  </tr>
-                              </tbody>
-                          </table>
-                      </div>
-                  </div>
-              </div>
-
-              <!-- History Section -->
-              <div id="history-section" class="content-section" style="display: none;">
-                  <div class="info-card glass-hover">
-                      <div class="card-header">
-                  <h5 class="mb-0">
-                    <i class="fas fa-history me-2"></i>
-                    History Log
-                  </h5>
+        <div class="content-wrapper">
+          <!-- Dashboard Section -->
+          <div id="dashboard-section" class="content-section">
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <h3 class="mb-2" style="position: relative; z-index: 1">
+                    <i class="fas fa-hand-wave me-2"></i>
+                    Selamat datang, Admin ${user.username}!
+                  </h3>
+                  <p class="mb-2" style="position: relative; z-index: 1">
+                    Anda login sebagai
+                    <span
+                      class="badge"
+                      style="background: rgba(12, 12, 12, 0.8); color: #64ffda"
+                      >Admin</span
+                    >
+                  </p>
+                  <p class="mb-0" style="position: relative; z-index: 1">
+                    Status:
+                    <span
+                      class="badge"
+                      style="background: rgba(12, 12, 12, 0.8); color: #1de9b6"
+                      >${user.status}</span
+                    >
+                  </p>
                 </div>
-                <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                      <thead>
-                        <tr
-                          style="
-                            background: linear-gradient(
-                              135deg,
-                              #667eea 0%,
-                              #764ba2 100%
-                            );
-                            color: white;
-                          "
-                        >
-                          <th>Tanggal</th>
-                          <th>User</th>
-                          <th>Action</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>2025-06-03 14:30</td>
-                          <td>Admin User</td>
-                          <td>Login to system</td>
-                          <td><span class="badge bg-success">Success</span></td>
-                        </tr>
-                        <tr>
-                          <td>2025-06-03 13:45</td>
-                          <td>john_doe</td>
-                          <td>Create new ticket</td>
-                          <td><span class="badge bg-info">Completed</span></td>
-                        </tr>
-                        <tr>
-                          <td>2025-06-03 12:20</td>
-                          <td>maria_santos</td>
-                          <td>Update profile</td>
-                          <td><span class="badge bg-success">Success</span></td>
-                        </tr>
-                        <tr>
-                          <td>2025-06-03 11:10</td>
-                          <td>developer_x</td>
-                          <td>Database maintenance</td>
-                          <td>
-                            <span class="badge bg-warning">In Progress</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                <div class="col-md-4 text-end">
+                  <div
+                    class="user-avatar mx-auto"
+                    style="
+                      width: 80px;
+                      height: 80px;
+                      font-size: 2rem;
+                      position: relative;
+                      z-index: 1;
+                    "
+                  >
+                    A
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Ticket Section -->
-            <div
-              id="ticket-section"
-              class="content-section"
-              style="display: none"
-            >
-              <div class="row stats-row">
-                <div class="col-md-4">
-                  <div class="card info-card">
-                    <div class="card-body text-center">
-                      <i class="fas fa-ticket-alt fa-2x text-primary mb-3"></i>
-                      <h5>Total Tickets</h5>
-                      <h2 class="text-primary">24</h2>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card info-card">
-                    <div class="card-body text-center">
-                      <i class="fas fa-clock fa-2x text-warning mb-3"></i>
-                      <h5>Pending</h5>
-                      <h2 class="text-warning">8</h2>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card info-card">
-                    <div class="card-body text-center">
-                      <i
-                        class="fas fa-check-circle fa-2x text-success mb-3"
-                      ></i>
-                      <h5>Resolved</h5>
-                      <h2 class="text-success">16</h2>
-                    </div>
-                  </div>
+            <!-- Stats Row -->
+            <div class="row mb-4">
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="stats-card glass-hover">
+                  <i class="fas fa-users stats-icon"></i>
+                  <div class="stats-number">${totalUsers}</div>
+                  <div class="stats-label">Total Users</div>
                 </div>
               </div>
-
-              <div class="card info-card">
-                <div class="card-header bg-transparent">
-                  <h5 class="mb-0">
-                    <i class="fas fa-list me-2"></i>
-                    Recent Tickets
-                  </h5>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="stats-card glass-hover">
+                  <i class="fas fa-ticket-alt stats-icon"></i>
+                  <div class="stats-number">${activeTickets}</div>
+                  <div class="stats-label">Active Tickets</div>
                 </div>
-                <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                      <thead>
-                        <tr
-                          style="
-                            background: linear-gradient(
-                              135deg,
-                              #667eea 0%,
-                              #764ba2 100%
-                            );
-                            color: white;
-                          "
-                        >
-                          <th>ID</th>
-                          <th>Title</th>
-                          <th>User</th>
-                          <th>Priority</th>
-                          <th>Status</th>
-                          <th>Created</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><code>#TKT001</code></td>
-                          <td>Login Issue</td>
-                          <td>john_doe</td>
-                          <td><span class="badge bg-danger">High</span></td>
-                          <td><span class="badge bg-warning">Pending</span></td>
-                          <td>2025-06-03</td>
-                        </tr>
-                        <tr>
-                          <td><code>#TKT002</code></td>
-                          <td>Database Connection</td>
-                          <td>maria_santos</td>
-                          <td><span class="badge bg-warning">Medium</span></td>
-                          <td>
-                            <span class="badge bg-info">In Progress</span>
-                          </td>
-                          <td>2025-06-02</td>
-                        </tr>
-                        <tr>
-                          <td><code>#TKT003</code></td>
-                          <td>Feature Request</td>
-                          <td>developer_x</td>
-                          <td><span class="badge bg-success">Low</span></td>
-                          <td>
-                            <span class="badge bg-success">Resolved</span>
-                          </td>
-                          <td>2025-06-01</td>
-                        </tr>
-                      </tbody>
-                    </table>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="stats-card glass-hover">
+                  <i class="fas fa-tools stats-icon"></i>
+                  <div class="stats-number">${technicians}</div>
+                  <div class="stats-label">Technicians</div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="stats-card glass-hover">
+                  <i class="fas fa-check-circle stats-icon"></i>
+                  <div class="stats-number">${completedTickets}</div>
+                  <div class="stats-label">Completed</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Info Card -->
+            <div class="info-card glass-hover">
+              <div class="card-header">
+                <h5 class="mb-0" style="color: rgba(255, 255, 255, 0.9)">
+                  <i class="fas fa-info-circle me-2"></i>
+                  Informasi Akun
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <p>
+                      <strong>ID:</strong>
+                      <code style="color: #64ffda">${user.id}</code>
+                    </p>
+                    <p><strong>Username:</strong> ${user.username}</p>
+                    <p class="mb-0">
+                      <strong>Role:</strong>
+                      <span class="badge bg-danger">${user.role}</span>
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <p>
+                      <strong>Status:</strong>
+                      <span class="badge bg-success">${user.status}</span>
+                    </p>
+                    <p class="mb-0">
+                      <strong>WhatsApp:</strong>
+                      <a
+                        href="https://wa.me/628123456789"
+                        class="wa-link"
+                        target="_blank"
+                      >
+                        <i class="fab fa-whatsapp me-1"></i>
+                        +62 812-3456-789
+                      </a>
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Technician Section -->
-            <div
-              id="technician-section"
-              class="content-section"
-              style="display: none"
-            >
-              <div class="row stats-row">
-                <div class="col-md-6">
-                  <div class="card info-card">
-                    <div class="card-body text-center">
-                      <i class="fas fa-users-cog fa-2x text-info mb-3"></i>
-                      <h5>Active Technicians</h5>
-                      <h2 class="text-info">5</h2>
-                    </div>
-                  </div>
+            <!-- Users Table -->
+            <div class="table-glass">
+              <div class="card-header">
+                <h5 class="mb-0" style="color: #ffffff">
+                  <i class="fas fa-users me-2" style="color: #ffffff"></i>
+                  Daftar Semua User
+                </h5>
+              </div>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Avatar</th>
+                      <th>Username</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>WhatsApp</th>
+                      <th>ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Loop melalui semua user dari controller -->
+                    <c:forEach var="user" items="${allUsers}">
+                      <tr>
+                        <!-- Avatar - ambil huruf pertama username -->
+                        <td>
+                          <div class="user-avatar">
+                            ${fn:substring(fn:toUpperCase(user.username), 0, 1)}
+                          </div>
+                        </td>
+
+                        <!-- Username -->
+                        <td><strong>${user.username}</strong></td>
+
+                        <!-- Role dengan badge berbeda -->
+                        <td>
+                          <c:choose>
+                            <c:when test="${user.role == 'admin'}">
+                              <span class="badge bg-danger">admin</span>
+                            </c:when>
+                            <c:when test="${user.role == 'technician'}">
+                              <span class="badge bg-warning">technician</span>
+                            </c:when>
+                            <c:otherwise>
+                              <span class="badge bg-primary">user</span>
+                            </c:otherwise>
+                          </c:choose>
+                        </td>
+
+                        <!-- Status -->
+                        <td>
+                          <c:choose>
+                            <c:when
+                              test="${fn:toLowerCase(user.status) == 'active'}"
+                            >
+                              <span class="badge bg-success">Active</span>
+                            </c:when>
+                            <c:otherwise>
+                              <span class="badge bg-info">Available</span>
+                            </c:otherwise>
+                          </c:choose>
+                        </td>
+
+                        <!-- WhatsApp -->
+                        <td>
+                          <c:choose>
+                            <c:when test="${not empty user.whatsapp}">
+                              <a
+                                href="https://wa.me/${fn:replace(user.whatsapp, '+', '')}"
+                                class="wa-link"
+                                target="_blank"
+                              >
+                                <i class="fab fa-whatsapp me-1"></i>
+                                ${user.whatsapp}
+                              </a>
+                            </c:when>
+                            <c:otherwise>
+                              <span class="text-muted">-</span>
+                            </c:otherwise>
+                          </c:choose>
+                        </td>
+
+                        <!-- User ID -->
+                        <td>
+                          <code style="color: #64ffda">user:${user.id}</code>
+                        </td>
+                      </tr>
+                    </c:forEach>
+
+                    <!-- Tampilkan pesan jika tidak ada user -->
+                    <c:if test="${empty allUsers}">
+                      <tr>
+                        <td colspan="6" class="text-center text-muted">
+                          <i class="fas fa-users-slash me-2"></i>
+                          Tidak ada data user
+                        </td>
+                      </tr>
+                    </c:if>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Users Table -->
+            <!-- Optional: Pagination jika data banyak -->
+            <c:if test="${fn:length(allUsers) > 10}">
+              <div
+                class="d-flex justify-content-between align-items-center mt-3"
+              >
+                <div class="text-muted">
+                  Menampilkan ${fn:length(allUsers)} user
                 </div>
-                <div class="col-md-6">
-                  <div class="card info-card">
-                    <div class="card-body text-center">
-                      <i class="fas fa-tasks fa-2x text-primary mb-3"></i>
-                      <h5>Assigned Tasks</h5>
-                      <h2 class="text-primary">12</h2>
-                    </div>
+                <nav aria-label="User pagination">
+                  <ul class="pagination pagination-sm">
+                    <li class="page-item disabled">
+                      <span class="page-link">Previous</span>
+                    </li>
+                    <li class="page-item active">
+                      <span class="page-link">1</span>
+                    </li>
+                    <li class="page-item disabled">
+                      <span class="page-link">Next</span>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </c:if>
+          </div>
+          <!-- Users Table -->
+
+          <!-- History Section -->
+          <div
+            id="history-section"
+            class="content-section"
+            style="display: none"
+          >
+            <div class="info-card glass-hover">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <i class="fas fa-history me-2"></i>
+                  History Log
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                    <thead>
+                      <tr
+                        style="
+                          background: linear-gradient(
+                            135deg,
+                            #667eea 0%,
+                            #764ba2 100%
+                          );
+                          color: white;
+                        "
+                      >
+                        <th>Tanggal</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>2025-06-03 14:30</td>
+                        <td>Admin User</td>
+                        <td>Login to system</td>
+                        <td><span class="badge bg-success">Success</span></td>
+                      </tr>
+                      <tr>
+                        <td>2025-06-03 13:45</td>
+                        <td>john_doe</td>
+                        <td>Create new ticket</td>
+                        <td><span class="badge bg-info">Completed</span></td>
+                      </tr>
+                      <tr>
+                        <td>2025-06-03 12:20</td>
+                        <td>maria_santos</td>
+                        <td>Update profile</td>
+                        <td><span class="badge bg-success">Success</span></td>
+                      </tr>
+                      <tr>
+                        <td>2025-06-03 11:10</td>
+                        <td>developer_x</td>
+                        <td>Database maintenance</td>
+                        <td>
+                          <span class="badge bg-warning">In Progress</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ticket Section -->
+          <div
+            id="ticket-section"
+            class="content-section"
+            style="display: none"
+          >
+            <div class="row stats-row">
+              <div class="col-md-4">
+                <div class="card info-card">
+                  <div class="card-body text-center">
+                    <i class="fas fa-ticket-alt fa-2x text-primary mb-3"></i>
+                    <h5 class="mb-0 text-white">Total Tickets</h5>
+                    <h2 class="text-primary">${totalTickets}</h2>
                   </div>
                 </div>
               </div>
-
-              <div class="card info-card">
-                <div class="card-header bg-transparent">
-                  <h5 class="mb-0">
-                    <i class="fas fa-tools me-2"></i>
-                    Technician List
-                  </h5>
+              <div class="col-md-4">
+                <div class="card info-card">
+                  <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x text-warning mb-3"></i>
+                    <h5 class="mb-0 text-white">Pending</h5>
+                    <h2 class="text-warning">${openTickets}</h2>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                      <thead>
-                        <tr
-                          style="
-                            background: linear-gradient(
-                              135deg,
-                              #667eea 0%,
-                              #764ba2 100%
-                            );
-                            color: white;
-                          "
-                        >
-                          <th>Avatar</th>
-                          <th>Name</th>
-                          <th>Specialization</th>
-                          <th>Status</th>
-                          <th>Current Tasks</th>
-                          <th>Contact</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <div class="user-avatar">T</div>
-                          </td>
-                          <td><strong>Tech Alpha</strong></td>
-                          <td>Network & Security</td>
-                          <td>
-                            <span class="badge bg-success">Available</span>
-                          </td>
-                          <td>2</td>
-                          <td>
-                            <a
-                              href="https://wa.me/628111222333"
-                              class="wa-link"
-                              target="_blank"
-                            >
-                              <i class="fab fa-whatsapp"></i>
-                            </a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="user-avatar">B</div>
-                          </td>
-                          <td><strong>Tech Beta</strong></td>
-                          <td>Database Admin</td>
-                          <td><span class="badge bg-warning">Busy</span></td>
-                          <td>4</td>
-                          <td>
-                            <a
-                              href="https://wa.me/628444555666"
-                              class="wa-link"
-                              target="_blank"
-                            >
-                              <i class="fab fa-whatsapp"></i>
-                            </a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="user-avatar">G</div>
-                          </td>
-                          <td><strong>Tech Gamma</strong></td>
-                          <td>System Integration</td>
-                          <td>
-                            <span class="badge bg-success">Available</span>
-                          </td>
-                          <td>1</td>
-                          <td>
-                            <a
-                              href="https://wa.me/628777888999"
-                              class="wa-link"
-                              target="_blank"
-                            >
-                              <i class="fab fa-whatsapp"></i>
-                            </a>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+              </div>
+              <div class="col-md-4">
+                <div class="card info-card">
+                  <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
+                    <h5 class="mb-0 text-white">Resolved</h5>
+                    <h2 class="text-success">${approvedTickets}</h2>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Footer -->
-            <div class="footer-section">
-              <div class="text-center">
-                <p class="text-muted mb-0">
-                  Work Flow Management Dashboard Application
-                </p>
+            <div class="info-card glass-hover">
+              <div class="card-header">
+                <h5 class="mb-0 text-white">
+                  <i class="fa-solid fa-globe" style="color: #ffffff"></i>
+                  Recent Tickets
+                </h5>
               </div>
+
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                    <thead>
+                      <tr
+                        style="
+                          background: linear-gradient(
+                            135deg,
+                            #667eea 0%,
+                            #764ba2 100%
+                          );
+                          color: white;
+                        "
+                      >
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>User</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><code>#TKT001</code></td>
+                        <td>Login Issue</td>
+                        <td>john_doe</td>
+                        <td><span class="badge bg-danger">High</span></td>
+                        <td><span class="badge bg-warning">Pending</span></td>
+                        <td>2025-06-03</td>
+                      </tr>
+                      <tr>
+                        <td><code>#TKT002</code></td>
+                        <td>Database Connection</td>
+                        <td>maria_santos</td>
+                        <td><span class="badge bg-warning">Medium</span></td>
+                        <td>
+                          <span class="badge bg-info">In Progress</span>
+                        </td>
+                        <td>2025-06-02</td>
+                      </tr>
+                      <tr>
+                        <td><code>#TKT003</code></td>
+                        <td>Feature Request</td>
+                        <td>developer_x</td>
+                        <td><span class="badge bg-success">Low</span></td>
+                        <td>
+                          <span class="badge bg-success">Resolved</span>
+                        </td>
+                        <td>2025-06-01</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Technician Section -->
+          <div
+            id="technician-section"
+            class="content-section"
+            style="display: none"
+          >
+            <div class="row stats-row">
+              <div class="col-md-6">
+                <div class="card info-card">
+                  <div class="card-body text-center">
+                    <i class="fas fa-users-cog fa-2x text-info mb-3"></i>
+                    <h5>Active Technicians</h5>
+                    <h2 class="text-info">5</h2>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card info-card">
+                  <div class="card-body text-center">
+                    <i class="fas fa-tasks fa-2x text-primary mb-3"></i>
+                    <h5>Assigned Tasks</h5>
+                    <h2 class="text-primary">12</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card info-card">
+              <div class="card-header bg-transparent">
+                <h5 class="mb-0">
+                  <i class="fas fa-tools me-2"></i>
+                  Technician List
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                    <thead>
+                      <tr
+                        style="
+                          background: linear-gradient(
+                            135deg,
+                            #667eea 0%,
+                            #764ba2 100%
+                          );
+                          color: white;
+                        "
+                      >
+                        <th>Avatar</th>
+                        <th>Name</th>
+                        <th>Specialization</th>
+                        <th>Status</th>
+                        <th>Current Tasks</th>
+                        <th>Contact</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <div class="user-avatar">T</div>
+                        </td>
+                        <td><strong>Tech Alpha</strong></td>
+                        <td>Network & Security</td>
+                        <td>
+                          <span class="badge bg-success">Available</span>
+                        </td>
+                        <td>2</td>
+                        <td>
+                          <a
+                            href="https://wa.me/628111222333"
+                            class="wa-link"
+                            target="_blank"
+                          >
+                            <i class="fab fa-whatsapp"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="user-avatar">B</div>
+                        </td>
+                        <td><strong>Tech Beta</strong></td>
+                        <td>Database Admin</td>
+                        <td><span class="badge bg-warning">Busy</span></td>
+                        <td>4</td>
+                        <td>
+                          <a
+                            href="https://wa.me/628444555666"
+                            class="wa-link"
+                            target="_blank"
+                          >
+                            <i class="fab fa-whatsapp"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="user-avatar">G</div>
+                        </td>
+                        <td><strong>Tech Gamma</strong></td>
+                        <td>System Integration</td>
+                        <td>
+                          <span class="badge bg-success">Available</span>
+                        </td>
+                        <td>1</td>
+                        <td>
+                          <a
+                            href="https://wa.me/628777888999"
+                            class="wa-link"
+                            target="_blank"
+                          >
+                            <i class="fab fa-whatsapp"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="footer-section">
+            <div class="text-center">
+              <p class="text-muted mb-0">
+                Work Flow Management Dashboard Application
+              </p>
             </div>
           </div>
         </div>
