@@ -7,19 +7,19 @@ public class User {
     private String password;
     private String status;
     private String role;
-    private String wa;
+    private String whatsapp;
 
     // Constructors
     public User() {
     }
 
-    public User(int id, String username, String password, String status, String role, String wa) {
+    public User(int id, String username, String password, String status, String role, String whatsapp) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.status = status;
         this.role = role;
-        this.wa = wa;
+        this.whatsapp = whatsapp;
     }
 
     public int getId() {
@@ -62,11 +62,11 @@ public class User {
         this.role = role;
     }
 
-    public String getWa() {
-        return wa;
+    public String getWhatsapp() {
+        return whatsapp;
     }
 
-    public void setWa(String wa) {
-        this.wa = wa;
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
     }
 }
