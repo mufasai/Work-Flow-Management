@@ -50,7 +50,7 @@ public class LoginController extends HttpServlet {
             {
                 switch (user.getRole()) {
                     case "technician" ->
-                        resp.sendRedirect(req.getContextPath() + "/technician/dashboard");
+                        resp.sendRedirect(req.getContextPath() + "/technician/ticket");
                     case "admin" ->
                         resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
                     default -> // Role tidak dikenal

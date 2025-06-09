@@ -25,74 +25,16 @@ uri="jakarta.tags.functions" %>
     />
   </head>
   <body>
-    <!-- Floating Shapes -->
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-      </div>
-  
-      <!-- Navigation -->
-      <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-          <div class="d-flex align-items-center">
-            <button class="sidebar-toggle me-3" onclick="toggleSidebar()">
-              <i class="fas fa-bars"></i>
-            </button>
-            <span class="navbar-brand mb-0">
-              <i class="fas fa-chart-line"></i>
-              Work Flow Management
-            </span>
-          </div>
-          <div class="d-flex align-items-center">
-            <span class="me-3" style="color: rgba(255, 255, 255, 0.8)">
-              <i class="fas fa-user-circle me-2" style="color: #64ffda"></i>
-              Technician ${user.username}
-            </span>
-            <button class="btn btn-logout">
-              <i class="fas fa-sign-out-alt me-2"></i>Logout
-            </button>
-          </div>
-        </div>
-      </nav>
-  
-      <div class="d-flex">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-          <ul class="sidebar-menu">
-            <li>
-              <a
-                href="#dashboard"
-                class="active"
-                onclick="showSection('dashboard')"
-              >
-                <i class="fas fa-tachometer-alt"></i>
-                Dashboard
-              </a>
-            </li>
-            <li>
-              <a href="#history" onclick="showSection('history')">
-                <i class="fas fa-history"></i>
-                History
-              </a>
-            </li>
-            <li>
-              <a href="${pageContext.request.contextPath}/technician/ticket" onclick="showSection('ticket')">
-                <i class="fas fa-ticket-alt"></i>
-                Ticket
-              </a>
-            </li>
-            <li>
-              <a href="#technician" onclick="showSection('technician')">
-                <i class="fas fa-tools"></i>
-                Technician
-              </a>
-            </li>
-          </ul>
-        </div>
-
-    <!-- Bootstrap JS -->
+    <div class="sidebar" id="sidebar">
+      <ul class="sidebar-menu">
+        <li>
+          <a href="" class="active" onclick="showSection('ticket')">
+            <i class="fas fa-ticket-alt"></i>
+            Ticket
+          </a>
+        </li>
+      </ul>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
     <script>

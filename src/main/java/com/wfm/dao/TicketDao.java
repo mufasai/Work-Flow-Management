@@ -15,7 +15,7 @@ public class TicketDao {
     // Method untuk mendapatkan semua tickets
     public static List<Ticket> getAllTickets() {
         List<Ticket> tickets = new ArrayList<>();
-        String query = "SELECT * FROM tickets ORDER BY created_at DESC";
+        String query = "SELECT * FROM tickets ";
 
         try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -132,6 +132,290 @@ public class TicketDao {
         }
 
         return stats;
+    }
+
+    public static Ticket getTicketById(int ticketId) {
+        String query = "SELECT * FROM tickets WHERE id = ?";
+        Ticket ticket = null;
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, ticketId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    ticket = new Ticket();
+                    ticket.setId(rs.getInt("id"));
+                    ticket.setTitle(rs.getString("title"));
+                    ticket.setDescription(rs.getString("description"));
+                    ticket.setCreatedBy(rs.getString("created_by"));
+                    ticket.setAssignTo(rs.getString("assign_to"));
+                    ticket.setStatus(rs.getString("status"));
+                    ticket.setCreatedAt(rs.getTimestamp("created_at"));
+                    ticket.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    ticket.setDeclinedReason(rs.getString("declined_reason"));
+                    ticket.setAddress(rs.getString("address"));
+                    ticket.setMaps(rs.getString("maps"));
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return ticket;
+    }
+
+    /**
+     * Method untuk mendapatkan tickets berdasarkan status
+     */
+    public static List<Ticket> getTicketsByStatus(String status) {
+        List<Ticket> tickets = new ArrayList<>();
+        String query = "SELECT * FROM tickets WHERE status = ? ORDER BY created_at DESC";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, status);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Ticket ticket = new Ticket();
+                    ticket.setId(rs.getInt("id"));
+                    ticket.setTitle(rs.getString("title"));
+                    ticket.setDescription(rs.getString("description"));
+                    ticket.setCreatedBy(rs.getString("created_by"));
+                    ticket.setAssignTo(rs.getString("assign_to"));
+                    ticket.setStatus(rs.getString("status"));
+                    ticket.setCreatedAt(rs.getTimestamp("created_at"));
+                    ticket.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    ticket.setDeclinedReason(rs.getString("declined_reason"));
+                    ticket.setAddress(rs.getString("address"));
+                    ticket.setMaps(rs.getString("maps"));
+                    tickets.add(ticket);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return tickets;
+    }
+
+    /**
+     * Method untuk mendapatkan tickets berdasarkan user yang membuat
+     */
+    public static List<Ticket> getTicketsByCreatedBy(String createdBy) {
+        List<Ticket> tickets = new ArrayList<>();
+        String query = "SELECT * FROM tickets WHERE created_by = ? ORDER BY created_at DESC";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, createdBy);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Ticket ticket = new Ticket();
+                    ticket.setId(rs.getInt("id"));
+                    ticket.setTitle(rs.getString("title"));
+                    ticket.setDescription(rs.getString("description"));
+                    ticket.setCreatedBy(rs.getString("created_by"));
+                    ticket.setAssignTo(rs.getString("assign_to"));
+                    ticket.setStatus(rs.getString("status"));
+                    ticket.setCreatedAt(rs.getTimestamp("created_at"));
+                    ticket.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    ticket.setDeclinedReason(rs.getString("declined_reason"));
+                    ticket.setAddress(rs.getString("address"));
+                    ticket.setMaps(rs.getString("maps"));
+                    tickets.add(ticket);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return tickets;
+    }
+
+    /**
+     * Method untuk mendapatkan tickets berdasarkan user yang ditugaskan
+     */
+    public static List<Ticket> getTicketsByAssignTo(int assignTo) {
+        List<Ticket> tickets = new ArrayList<>();
+        String query = "SELECT * FROM tickets WHERE assign_to = ?";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, assignTo);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Ticket ticket = new Ticket();
+                    ticket.setId(rs.getInt("id"));
+                    ticket.setTitle(rs.getString("title"));
+                    ticket.setDescription(rs.getString("description"));
+                    ticket.setCreatedBy(rs.getString("created_by"));
+                    ticket.setAssignTo(rs.getString("assign_to"));
+                    ticket.setStatus(rs.getString("status"));
+                    ticket.setCreatedAt(rs.getTimestamp("created_at"));
+                    ticket.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    ticket.setDeclinedReason(rs.getString("declined_reason"));
+                    ticket.setAddress(rs.getString("address"));
+                    ticket.setMaps(rs.getString("maps"));
+                    tickets.add(ticket);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return tickets;
+    }
+
+    /**
+     * Method untuk update status ticket
+     */
+    public static boolean updateTicketStatus(int ticketId, String newStatus) {
+        String query = "UPDATE tickets SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, newStatus);
+            stmt.setInt(2, ticketId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Method untuk assign ticket ke technician
+     */
+    public static boolean assignTicket(int ticketId, String assignTo) {
+        String query = "UPDATE tickets SET assign_to = ?, status = 'assigned', updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, assignTo);
+            stmt.setInt(2, ticketId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // NEW METHOD: Method untuk mendapatkan statistik ticket berdasarkan technician yang di-assign
+    public static TicketStatistics getTicketStatisticsByTechnician(int assignTo) {
+        TicketStatistics stats = new TicketStatistics();
+
+        // Query yang BENAR - filter berdasarkan assign_to
+        String query = "SELECT status, COUNT(*) as count FROM tickets WHERE assign_to = ? GROUP BY status";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, assignTo); // Filter berdasarkan technician ID
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String status = rs.getString("status");
+                    int count = rs.getInt("count");
+
+                    switch (status) {
+                        case "open" ->
+                            stats.setOpenCount(count);
+                        case "assigned" ->
+                            stats.setAssignedCount(count);
+                        case "in_progress" ->
+                            stats.setInProgressCount(count);
+                        case "done" ->
+                            stats.setDoneCount(count);
+                        case "approved" ->
+                            stats.setApprovedCount(count);
+                    }
+
+                    stats.setTotal(stats.getTotal() + count);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return stats;
+    }
+
+    /**
+     * Method untuk membuat ticket baru
+     */
+    public static boolean createTicket(Ticket ticket) {
+        String query = "INSERT INTO tickets (title, description, created_by, assign_to, status, address, maps, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, ticket.getTitle());
+            stmt.setString(2, ticket.getDescription());
+            stmt.setString(3, ticket.getCreatedBy());
+            stmt.setString(4, ticket.getAssignTo());
+            stmt.setString(5, ticket.getStatus());
+            stmt.setString(6, ticket.getAddress());
+            stmt.setString(7, ticket.getMaps());
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Method untuk update ticket
+     */
+    public static boolean updateTicket(Ticket ticket) {
+        String query = "UPDATE tickets SET title = ?, description = ?, assign_to = ?, status = ?, address = ?, maps = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, ticket.getTitle());
+            stmt.setString(2, ticket.getDescription());
+            stmt.setString(3, ticket.getAssignTo());
+            stmt.setString(4, ticket.getStatus());
+            stmt.setString(5, ticket.getAddress());
+            stmt.setString(6, ticket.getMaps());
+            stmt.setInt(7, ticket.getId());
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Method untuk menghapus ticket
+     */
+    public static boolean deleteTicket(int ticketId) {
+        String query = "DELETE FROM tickets WHERE id = ?";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, ticketId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     // Inner class untuk statistik ticket
