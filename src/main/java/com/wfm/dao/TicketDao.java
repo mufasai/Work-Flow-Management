@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,24 +17,41 @@ public class TicketDao {
     
     private final UserDao userDao = new UserDao();
     
+    
     public void createTicket(Ticket ticket){
         
         String query = "INSERT INTO ticket (title, description, created_by, status, address, maps, created_at, update_at)" 
         + "VALUES (?, ?, ?, 'open', ?, ?, NOW(), NOW())";
 
         try (Connection conn = DatabaseConnector.getConnection();
-        PreparedStatement stmt = conn.prepareStatement(query)) {
+        PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, ticket.getTitle());
             stmt.setString(2, ticket.getDescription());
-            stmt.setInt(3, ticket.getId());
+            //stmt.setInt(3, ticket.getId());
+            stmt.setString(3, ticket.getCreatedBy());
             stmt.setString(4, ticket.getAddress());
             stmt.setString(5, ticket.getMaps());
 
-            stmt.executeUpdate();
+            int affectedRows = stmt.executeUpdate();
+
+            // untuk mengambil ID yang digenerate jika terdapat baris yang terpengaruh
+
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()){
+                    if (generatedKeys.next()){
+                        ticket.setId(generatedKeys.getInt(1)); // mengset id yang dihasilkan objek ke Ticket 
+                    }
+                }
+            }
             
-        } catch (Exception e) {
+            
+        } catch (SQLException e) {
+            System.err.println("Error Creating TIcket : " + e.getMessage());
             // TODO: handle exception
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error creating ticket (Driver not Found) : " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -49,15 +66,57 @@ public class TicketDao {
         ticket.setAddress(rs.getString("address"));
         ticket.setMaps(rs.getString("maps"));
         ticket.setDeclinedReason(rs.getString("decline_reason"));
+        ticket.setCreatedAt(rs.getTimestamp("created_at"));
+        ticket.setUpdatedAt(rs.getTimestamp("updated_at"));
 
-        Timestamp created = rs.getTimestamp("created_at");
-        Timestamp updated = rs.getTimestamp("updated_at");
+        /*
+        Timestamp created = rs.getTimestamp("created_by");ticket.
+        Timestamp updated = rs.getTimestamp("updated_by");
         
         int cretaedById = rs.getInt("created_by");
         int assignToId = rs.getInt("assign_to");
+        */
 
+        String createdBydb = rs.getString("created_by");
+        if (createdBydb != null) {
+            ticket.setCreatedBy(createdBydb);
+        } else {
+            ticket.setCreatedBy(null);
+        }
+
+        int assignToId = rs.getInt("assign_to");
+        if (assignToId != 0) {
+           User assignedUser = userDao.getUserById(assignToId);
+           if (assignedUser != null) {
+            ticket.setAssignTo(assignedUser.getUsername());
+           } else {
+            ticket.setAssignTo(String.valueOf(assignToId));
+           }
+        } else {
+            ticket.setAssignTo(null);
+        }
         return ticket;
 
+    }
+
+
+    // menambahkan method untuk getTicketBy Id 
+    public Ticket getTicketById(int id){
+        String query = "SELECT * FROM ticket WHERE id = ? ";
+        try (Connection conn = DatabaseConnector.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()){
+                if (rs.next()){
+                    return mapResultSetTicket(rs);
+                }
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error getting ticket by ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void assignTechnician(int ticketId, User technician){
@@ -71,9 +130,14 @@ public class TicketDao {
             
             stmt.executeUpdate();
             
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // TODO: handle exception
+            System.err.println("Error assingning technician: " + e.getMessage());
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.err.println("Database driver not found: " + e.getMessage());
+            e.printStackTrace();
+        
         }
     }
 
@@ -87,10 +151,16 @@ public class TicketDao {
             stmt.setString(2, declineReason);
             stmt.setInt(3, ticketId);
 
+            stmt.executeUpdate();
+
             
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // TODO: handle exception
+            System.err.println("Error updating ticket status: "+e.getMessage());
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.err.println("Database driver not found: " + e.getMessage());
+
         }
     }
 
@@ -103,6 +173,8 @@ public class TicketDao {
         try (Connection conn = DatabaseConnector.getConnection();
         PreparedStatement stmt = conn.prepareStatement(query)) {
 
+            stmt.setString(1, status);
+
             try(ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()){
                     tickets.add(mapResultSetTicket(rs));
@@ -110,8 +182,12 @@ public class TicketDao {
                 
             } 
             
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // TODO: handle exception
+            System.err.println("Error getting ticket by status: " + e.getMessage());
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.err.println("Database driver not found: " + e.getMessage());
             e.printStackTrace();
         }
         return tickets;
@@ -125,10 +201,12 @@ public class TicketDao {
         List<Ticket> tickets = new ArrayList<>();
         String query = "SELECT * FROM tickets ORDER BY created_at DESC";
 
-        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DatabaseConnector.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
+                    
                     Ticket ticket = new Ticket();
                     ticket.setId(rs.getInt("id"));
                     ticket.setTitle(rs.getString("title"));
@@ -142,9 +220,14 @@ public class TicketDao {
                     ticket.setAddress(rs.getString("address"));
                     ticket.setMaps(rs.getString("maps"));
                     tickets.add(ticket);
+                    
                 }
             }
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException  e) {
+            System.err.println("Error getting all tickets: " + e.getMessage());
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.err.println("Database driver not found: " + e.getMessage());
             e.printStackTrace();
         }
 
