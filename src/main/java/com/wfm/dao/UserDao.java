@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mysql.cj.x.protobuf.MysqlxSql;
 import com.wfm.model.User;
 import com.wfm.util.DatabaseConnector;
 
@@ -116,5 +117,50 @@ public class UserDao {
         }
 
         return null;
+    }
+
+    public static int getTechnicianCount(){
+        String query = "SELECT COUNT(*) AS count FROM user WHERE role = 'technician'";
+        
+        int count = 0;
+        try (Connection conn = DatabaseConnector.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(query)){
+            try(ResultSet rs = stmt.executeQuery()){
+                if (rs.next()){
+                    count = rs.getInt("count");
+                }
+            }
+            
+        } catch (SQLException  | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
+    public List<User> getAllTechnician(){
+        List<User> technicians = new ArrayList<>();
+        String query = "SELECT * FROM user WHERE role = 'technician'";
+
+        try (Connection conn = DatabaseConnector.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            try (ResultSet rs = stmt.executeQuery()){
+                while (rs.next()){
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setStatus(rs.getString("status"));
+                    user.setWhatsapp(rs.getString("wa"));
+                    user.setRole(rs.getString("role"));
+                    technicians.add(user);
+                }
+            }
+            
+        } catch (SQLException  | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return technicians;
     }
 }

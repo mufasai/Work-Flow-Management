@@ -1024,7 +1024,11 @@ uri="jakarta.tags.functions" %>
                   <div class="card-body text-center">
                     <i class="fas fa-ticket-alt fa-2x text-primary mb-3"></i>
                     <h5 class="mb-0 text-white">Total Tickets</h5>
+                     <!-- Penambahan -->
                     <h2 class="text-primary">${totalTickets}</h2>
+                    <h2 class="text-warning">${openTickets}</h2>
+                    <h2 class="text-success">${approvedTickets}</h2>
+                 <!-- sampai ini -->
                   </div>
                 </div>
               </div>
@@ -1076,10 +1080,50 @@ uri="jakarta.tags.functions" %>
                         <th>Priority</th>
                         <th>Status</th>
                         <th>Created</th>
+                        <th>Maps</th>
+                        <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
+                        <!-- DIUBAH-->
+                        <!-- Loop melalui controller -->
+                         <c:forEach var="ticket" items="${recentTickets}">
+                          <tr>
+                            <td><code>TKT001<c:out value="${ticket.id}"/></code></td>
+                            <td><c:out value="${ticket.title}"></c></td>
+                            <td><c:out value="${ticket.createdBy}" /></td>
+                            <td> 
+                              <span class="status-badge status-${ticket.status}">
+                                  <c:out value="${ticket.status}" />
+                              </span>
+                            </td>
+                            <td><c:out value="${ticket.createdAt}"></td>
+                            <td>
+                              <c:if test="${not empty ticket.maps}">
+                                 <a href="${ticket.maps}" target="_blank" class="btn btn-sm btn-outline-info">Lihat Maps</a>
+                              </c:if>
+                              <c:if test="${empty ticket.maps}">-</c:if>
+                            </td> <!-- menampilkan data maps -->
+                            <td> 
+                              <form action="${pageContext.request.contextPath}/tickets/updateStatus" method="post" style="display:inline-block; margin-right: 5px;">
+                                 <input type="hidden" name="ticketId" value="${ticket.id}" />
+                                  <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="open" ${ticket.status eq 'open' ? 'selected' : ''}>Open</option>
+                                        <option value="assigned" ${ticket.status eq 'assigned' ? 'selected' : ''}>Assigned</option>
+                                        <option value="in_progress" ${ticket.status eq 'in_progress' ? 'selected' : ''}>In Progress</option>
+                                        <option value="done" ${ticket.status eq 'done' ? 'selected' : ''}>Done</option>
+                                        <option value="approved" ${ticket.status eq 'approved' ? 'selected' : ''}>Approved</option>
+                                        <option value="declined" ${ticket.status eq 'declined' ? 'selected' : ''}>Declined</option>
+                                    </select>
+                              </form>
+                              <a href="${pageContext.request.contextPath}/tickets/assign?ticketId=${ticket.id}" class="btn btn-sm btn-warning mt-1">Assign</a>
+                            </td>                          
+                          </tr>
+                        </c:forEach
+                        <c:if test="${empty recentTickets}"></c>
+                        
+                         <!-- iniii-->
                         <td><code>#TKT001</code></td>
                         <td>Login Issue</td>
                         <td>john_doe</td>

@@ -7,8 +7,8 @@ public class Ticket {
     private int id;
     private String title;
     private String description;
-    private String createdBy;
-    private String assignTo;
+    private String createdBy; // String (username/nama user)
+    private String assignTo; // String (username/nama teknisi)
     private String status; // 'open', 'assigned', 'in_progress', 'done', 'approved'
     private Timestamp createdAt;
     private Timestamp updatedAt;
