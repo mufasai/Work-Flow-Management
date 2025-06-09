@@ -4,15 +4,30 @@ import java.sql.Timestamp;
 
 public class TicketHistory {
     private String id;
-    private String ticket;
+    private Ticket ticket;          // Relasi ke Ticket.java
+    private User technician;        // Relasi ke User.java
+    private String action;          // Contoh: "assigned", "in_progress", "done", "approved", "declined"
     private String notes;
-    private int ticketId;
-    private String updatedBy;
+    private Timestamp timestamp;
+    private Timestamp createdAt;
     private Timestamp updatedAt;
 
+    // Constructor kosong
+    public TicketHistory() {
+    }
 
-    // Constructor
-    public TicketHistory() {}
+    // Constructor lengkap
+    public TicketHistory(String id, Ticket ticket, User technician, String action, String notes,
+                         Timestamp timestamp, Timestamp createdAt, Timestamp updatedAt) {
+        this.id = id;
+        this.ticket = ticket;
+        this.technician = technician;
+        this.action = action;
+        this.notes = notes;
+        this.timestamp = timestamp;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
     // Getter dan Setter
     public String getId() {
@@ -22,51 +37,29 @@ public class TicketHistory {
     public void setId(String id) {
         this.id = id;
     }
-    
-    public TicketHistory(String id) {
-        this.id = id;
-    }
 
-    public String getTicket() {
+    public Ticket getTicket() {
         return ticket;
     }
 
-    public void setTicket(String ticket) {
+    public void setTicket(Ticket ticket) {
         this.ticket = ticket;
     }
 
-    private String user;
-    public String getUser() {
-        return user;
+    public User getTechnician() {
+        return technician;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setTechnician(User technician) {
+        this.technician = technician;
     }
 
-    public int getTicketId() {
-        return ticketId;
+    public String getAction() {
+        return action;
     }
 
-    public void setTicketId(int ticketId) {
-        this.ticketId = ticketId;
-    }
-
-    
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setAction(String action) {
+        this.action = action;
     }
 
     public String getNotes() {
@@ -77,8 +70,27 @@ public class TicketHistory {
         this.notes = notes;
     }
 
-    public void setId(int int1) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setId'");
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
