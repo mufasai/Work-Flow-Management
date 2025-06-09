@@ -12,11 +12,11 @@ public class TicketHistory {
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
-    // Constructor kosong
+    // Constructor 
     public TicketHistory() {
     }
 
-    // Constructor lengkap
+    // Constructor
     public TicketHistory(String id, Ticket ticket, User technician, String action, String notes,
                          Timestamp timestamp, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
