@@ -5,10 +5,12 @@ import java.util.List;
 
 import com.wfm.dao.TicketDao;
 import com.wfm.dao.TicketDao.TicketStatistics;
+import com.wfm.dao.UserDao;
 import com.wfm.model.Ticket;
 import com.wfm.model.User;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/admin/ticket")
+@MultipartConfig
 public class TicketControllerAdmin extends HttpServlet {
 
     @Override
@@ -30,6 +33,10 @@ public class TicketControllerAdmin extends HttpServlet {
                     // === DATA TICKETS ===
                     List<Ticket> tickets = TicketDao.getAllTickets();
                     req.setAttribute("tickets", tickets);
+
+                    // === LOAD TECHNICIANS FOR DROPDOWN ===
+                    List<User> technicians = UserDao.getUsersByRole("technician");
+                    req.setAttribute("technicians", technicians);
 
                     // === TICKET STATISTICS ===
                     TicketStatistics ticketStats = TicketDao.getTicketStatistics();
@@ -134,7 +141,11 @@ public class TicketControllerAdmin extends HttpServlet {
             Ticket ticket = new Ticket();
             ticket.setTitle(title.trim());
             ticket.setDescription(description.trim());
-            ticket.setCreatedBy(admin.getUsername());
+
+            // FIX: Use admin.getId() instead of admin.getUsername()
+            // created_by should store user ID (integer), not username (string)
+            ticket.setCreatedBy(String.valueOf(admin.getId()));
+
             ticket.setStatus("open"); // Default status
             ticket.setAddress(address != null ? address.trim() : "");
             ticket.setMaps(maps != null ? maps.trim() : "");
@@ -142,7 +153,6 @@ public class TicketControllerAdmin extends HttpServlet {
             // If assignTo is provided, set it and change status to assigned
             if (assignTo != null && !assignTo.trim().isEmpty() && !assignTo.equals("0")) {
                 ticket.setAssignTo(assignTo.trim());
-                ticket.setStatus("assigned");
             }
 
             boolean success = TicketDao.createTicket(ticket);

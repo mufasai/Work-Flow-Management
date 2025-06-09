@@ -359,8 +359,31 @@ public class TicketDao {
 
             stmt.setString(1, ticket.getTitle());
             stmt.setString(2, ticket.getDescription());
-            stmt.setString(3, ticket.getCreatedBy());
-            stmt.setString(4, ticket.getAssignTo());
+
+            // FIX: created_by should be set as INTEGER (user ID)
+            if (ticket.getCreatedBy() != null && !ticket.getCreatedBy().trim().isEmpty()) {
+                try {
+                    int createdById = Integer.parseInt(ticket.getCreatedBy());
+                    stmt.setInt(3, createdById);
+                } catch (NumberFormatException e) {
+                    stmt.setNull(3, java.sql.Types.INTEGER);
+                }
+            } else {
+                stmt.setNull(3, java.sql.Types.INTEGER);
+            }
+
+            // FIX: assign_to should be set as INTEGER (user ID)
+            if (ticket.getAssignTo() != null && !ticket.getAssignTo().trim().isEmpty()) {
+                try {
+                    int assignToId = Integer.parseInt(ticket.getAssignTo());
+                    stmt.setInt(4, assignToId);
+                } catch (NumberFormatException e) {
+                    stmt.setNull(4, java.sql.Types.INTEGER);
+                }
+            } else {
+                stmt.setNull(4, java.sql.Types.INTEGER);
+            }
+
             stmt.setString(5, ticket.getStatus());
             stmt.setString(6, ticket.getAddress());
             stmt.setString(7, ticket.getMaps());
@@ -416,6 +439,88 @@ public class TicketDao {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // NEW METHOD: Accept ticket by technician
+    /**
+     * Method untuk accept ticket oleh technician - Update status menjadi
+     * 'in_progress' untuk technician view - Update status menjadi 'assigned'
+     * untuk admin view - Set assign_to ke technician yang accept
+     */
+    public static boolean acceptTicketByTechnician(int ticketId, int technicianId) {
+        String query = "UPDATE tickets SET assign_to = ?, status = 'in_progress', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'open'";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, technicianId);
+            stmt.setInt(2, ticketId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // NEW METHOD: Decline ticket by technician  
+    /**
+     * Method untuk decline ticket oleh technician - Update status menjadi
+     * 'open' (kembali ke pool untuk technician lain) - Set declined_reason -
+     * Reset assign_to menjadi NULL
+     */
+    public static boolean declineTicketByTechnician(int ticketId, String declineReason) {
+        String query = "UPDATE tickets SET assign_to = NULL, status = 'open', declined_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'open'";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, declineReason);
+            stmt.setInt(2, ticketId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // METHOD YANG DIPERBAIKI: Untuk mendapatkan tickets yang bisa di-accept/decline oleh technician
+    /**
+     * Method untuk mendapatkan open tickets yang bisa di-accept oleh technician
+     * Ini akan menampilkan semua tickets dengan status 'open' yang belum
+     * di-assign
+     */
+    public static List<Ticket> getAvailableTicketsForTechnician() {
+        List<Ticket> tickets = new ArrayList<>();
+        String query = "SELECT * FROM tickets WHERE status = 'open' ORDER BY created_at ASC";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Ticket ticket = new Ticket();
+                    ticket.setId(rs.getInt("id"));
+                    ticket.setTitle(rs.getString("title"));
+                    ticket.setDescription(rs.getString("description"));
+                    ticket.setCreatedBy(rs.getString("created_by"));
+                    ticket.setAssignTo(rs.getString("assign_to"));
+                    ticket.setStatus(rs.getString("status"));
+                    ticket.setCreatedAt(rs.getTimestamp("created_at"));
+                    ticket.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    ticket.setDeclinedReason(rs.getString("declined_reason"));
+                    ticket.setAddress(rs.getString("address"));
+                    ticket.setMaps(rs.getString("maps"));
+                    tickets.add(ticket);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return tickets;
     }
 
     // Inner class untuk statistik ticket

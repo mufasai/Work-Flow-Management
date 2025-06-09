@@ -9,6 +9,7 @@ import com.wfm.model.Ticket;
 import com.wfm.model.User;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/technician/ticket")
+@MultipartConfig
 public class TicketController extends HttpServlet {
 
     @Override
@@ -31,7 +33,6 @@ public class TicketController extends HttpServlet {
                     int technicianId = user.getId();
 
                     List<Ticket> tickets = TicketDao.getTicketsByAssignTo(technicianId);
-                    req.setAttribute("tickets", tickets);
                     req.setAttribute("tickets", tickets);
 
                     // PERBAIKAN 3: TICKET STATISTICS - Gunakan technicianId yang benar
@@ -83,7 +84,7 @@ public class TicketController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Handle POST requests for ticket operations (future implementation)
+        // Handle POST requests for ticket operations
         String action = req.getParameter("action");
 
         switch (action) {
@@ -93,6 +94,10 @@ public class TicketController extends HttpServlet {
                 handleEditTicket(req, resp);
             case "update" ->
                 handleUpdateTicket(req, resp);
+            case "accept" ->
+                handleAcceptTicket(req, resp);
+            case "decline" ->
+                handleDeclineTicket(req, resp);
             default ->
                 resp.sendRedirect(req.getRequestURI());
         }
@@ -118,5 +123,129 @@ public class TicketController extends HttpServlet {
         String ticketId = req.getParameter("ticketId");
         String status = req.getParameter("status");
         resp.getWriter().write("{\"status\":\"success\",\"message\":\"Updated ticket " + ticketId + " to " + status + "\"}");
+    }
+
+    // NEW METHOD: Handle Accept Ticket
+    private void handleAcceptTicket(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Unauthorized\"}");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        String ticketIdStr = req.getParameter("ticketId");
+
+        if (ticketIdStr == null || ticketIdStr.trim().isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Ticket ID is required\"}");
+            return;
+        }
+
+        try {
+            int ticketId = Integer.parseInt(ticketIdStr);
+
+            // Verifikasi ticket exists dan statusnya open
+            Ticket ticket = TicketDao.getTicketById(ticketId);
+            if (ticket == null) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.getWriter().write("{\"status\":\"error\",\"message\":\"Ticket not found\"}");
+                return;
+            }
+
+            if (!"open".equals(ticket.getStatus())) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("{\"status\":\"error\",\"message\":\"Only open tickets can be accepted\"}");
+                return;
+            }
+
+            // Update status ticket ke "in_progress" untuk technician view
+            // Dan assign ticket ke technician yang login
+            boolean success = TicketDao.acceptTicketByTechnician(ticketId, user.getId());
+
+            if (success) {
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"status\":\"success\",\"message\":\"Ticket accepted successfully\"}");
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().write("{\"status\":\"error\",\"message\":\"Failed to accept ticket\"}");
+            }
+
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Invalid ticket ID format\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Internal server error: " + e.getMessage() + "\"}");
+        }
+    }
+
+    // NEW METHOD: Handle Decline Ticket
+    private void handleDeclineTicket(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Unauthorized\"}");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        String ticketIdStr = req.getParameter("ticketId");
+        String declineReason = req.getParameter("reason");
+
+        if (ticketIdStr == null || ticketIdStr.trim().isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Ticket ID is required\"}");
+            return;
+        }
+
+        if (declineReason == null || declineReason.trim().isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Decline reason is required\"}");
+            return;
+        }
+
+        try {
+            int ticketId = Integer.parseInt(ticketIdStr);
+
+            // Verifikasi ticket exists dan statusnya open
+            Ticket ticket = TicketDao.getTicketById(ticketId);
+            if (ticket == null) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.getWriter().write("{\"status\":\"error\",\"message\":\"Ticket not found\"}");
+                return;
+            }
+
+            if (!"open".equals(ticket.getStatus())) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("{\"status\":\"error\",\"message\":\"Only open tickets can be declined\"}");
+                return;
+            }
+
+            // Decline ticket dan set reason
+            boolean success = TicketDao.declineTicketByTechnician(ticketId, declineReason);
+
+            if (success) {
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"status\":\"success\",\"message\":\"Ticket declined successfully\"}");
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().write("{\"status\":\"error\",\"message\":\"Failed to decline ticket\"}");
+            }
+
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Invalid ticket ID format\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Internal server error: " + e.getMessage() + "\"}");
+        }
     }
 }

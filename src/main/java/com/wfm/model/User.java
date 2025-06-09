@@ -1,5 +1,7 @@
 package com.wfm.model;
 
+import java.sql.Timestamp;
+
 public class User {
 
     private int id;
@@ -8,18 +10,20 @@ public class User {
     private String status;
     private String role;
     private String whatsapp;
+    private Timestamp createdAt;
 
     // Constructors
     public User() {
     }
 
-    public User(int id, String username, String password, String status, String role, String whatsapp) {
+    public User(int id, String username, String password, String status, String role, String whatsapp, Timestamp createdAt) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.status = status;
         this.role = role;
         this.whatsapp = whatsapp;
+        this.createdAt = createdAt;
     }
 
     public int getId() {
@@ -68,5 +72,13 @@ public class User {
 
     public void setWhatsapp(String whatsapp) {
         this.whatsapp = whatsapp;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }

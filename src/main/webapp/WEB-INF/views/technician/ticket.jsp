@@ -132,7 +132,7 @@
                   <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search tickets..." style="width: 200px;">
                 </div>
               </div>
-
+            
               <div class="card-body">
                 <div class="table-responsive">
                   <table class="table table-hover mb-0" id="ticketsTable">
@@ -244,6 +244,7 @@
                               </td>
                               <td>
                                 <div class="btn-group btn-group-sm" role="group">
+                                  <!-- Standard Actions for All Status -->
                                   <button type="button" class="btn btn-outline-primary" title="View Details" 
                                           onclick="viewTicket('${ticket.id}')">
                                     <i class="fas fa-eye"></i>
@@ -256,6 +257,18 @@
                                     <button type="button" class="btn btn-outline-info" title="View Location"
                                             onclick="viewLocation('${ticket.maps}')">
                                       <i class="fas fa-map"></i>
+                                    </button>
+                                  </c:if>
+                                  
+                                  <!-- Special Actions for Open Status Only -->
+                                  <c:if test="${ticket.status == 'open'}">
+                                    <button type="button" class="btn btn-outline-success" title="Accept Ticket"
+                                            onclick="acceptTicket('${ticket.id}')">
+                                      <i class="fas fa-check"></i> Accept
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" title="Decline Ticket"
+                                            onclick="showDeclineModal('${ticket.id}', '${fn:escapeXml(ticket.title)}')">
+                                      <i class="fas fa-times"></i> Decline
                                     </button>
                                   </c:if>
                                 </div>
@@ -283,6 +296,56 @@
                     <small>Showing ${fn:length(tickets)} ticket(s)</small>
                   </div>
                 </c:if>
+              </div>
+            </div>
+            
+            <!-- Decline Modal -->
+            <div class="modal fade" id="declineModal" tabindex="-1" aria-labelledby="declineModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="declineModalLabel">Decline Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="mb-3">
+                      <label class="form-label"><strong>Ticket:</strong> <span id="declineTicketTitle"></span></label>
+                    </div>
+                    <div class="mb-3">
+                      <label for="declineReason" class="form-label">Reason for declining:</label>
+                      <textarea class="form-control" id="declineReason" rows="3" placeholder="Please provide a reason for declining this ticket..." required></textarea>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDeclineTicket()">
+                      <i class="fas fa-times me-1"></i>Decline Ticket
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Toast Notifications -->
+            <div class="toast-container position-fixed top-0 end-0 p-3">
+              <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                  <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span id="successMessage"></span>
+                  </div>
+                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+              </div>
+              
+              <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                  <div class="toast-body">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="errorMessage"></span>
+                  </div>
+                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
               </div>
             </div>
           </div>
@@ -391,6 +454,150 @@
         if (mapsUrl) {
           window.open(mapsUrl, '_blank');
         }
+      }
+      let currentDeclineTicketId = null;
+
+      // Function to accept ticket
+      function acceptTicket(ticketId) {
+          if (confirm('Are you sure you want to accept this ticket?')) {
+              const formData = new FormData();
+              formData.append('action', 'accept');
+              formData.append('ticketId', ticketId);
+              
+              fetch('${pageContext.request.contextPath}/technician/ticket', {
+                  method: 'POST',
+                  body: formData
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      showToast('successToast', data.message);
+                      // Reload page after 1.5 seconds
+                      setTimeout(() => {
+                          location.reload();
+                      }, 1500);
+                  } else {
+                      showToast('errorToast', data.message);
+                  }
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+                  showToast('errorToast', 'An error occurred while accepting the ticket.');
+              });
+          }
+      }
+
+      // Function to show decline modal
+      function showDeclineModal(ticketId, ticketTitle) {
+          currentDeclineTicketId = ticketId;
+          document.getElementById('declineTicketTitle').textContent = ticketTitle;
+          document.getElementById('declineReason').value = '';
+          
+          const modal = new bootstrap.Modal(document.getElementById('declineModal'));
+          modal.show();
+      }
+
+      // Function to confirm decline ticket
+      function confirmDeclineTicket() {
+          const reason = document.getElementById('declineReason').value.trim();
+          
+          if (!reason) {
+              alert('Please provide a reason for declining the ticket.');
+              return;
+          }
+          
+          const formData = new FormData();
+          formData.append('action', 'decline');
+          formData.append('ticketId', currentDeclineTicketId);
+          formData.append('reason', reason);
+          
+          fetch('${pageContext.request.contextPath}/technician/ticket', {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+              // Hide modal
+              const modal = bootstrap.Modal.getInstance(document.getElementById('declineModal'));
+              modal.hide();
+              
+              if (data.status === 'success') {
+                  showToast('successToast', data.message);
+                  // Reload page after 1.5 seconds
+                  setTimeout(() => {
+                      location.reload();
+                  }, 1500);
+              } else {
+                  showToast('errorToast', data.message);
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              showToast('errorToast', 'An error occurred while declining the ticket.');
+              
+              // Hide modal on error too
+              const modal = bootstrap.Modal.getInstance(document.getElementById('declineModal'));
+              modal.hide();
+          });
+      }
+
+      // Function to show toast notifications
+      function showToast(toastId, message) {
+          const toastElement = document.getElementById(toastId);
+          const messageElement = toastElement.querySelector('[id$="Message"]');
+          messageElement.textContent = message;
+          
+          const toast = new bootstrap.Toast(toastElement);
+          toast.show();
+      }
+
+      // Existing functions (you should keep these if they exist in your original code)
+      function viewTicket(ticketId) {
+          // Your existing view ticket implementation
+          console.log('View ticket:', ticketId);
+      }
+
+      function editTicket(ticketId) {
+          // Your existing edit ticket implementation
+          console.log('Edit ticket:', ticketId);
+      }
+
+      function viewLocation(maps) {
+          // Your existing view location implementation
+          if (maps) {
+              window.open(maps, '_blank');
+          }
+      }
+
+      // Filter and search functionality
+      document.getElementById('statusFilter').addEventListener('change', function() {
+          filterTable();
+      });
+
+      document.getElementById('searchInput').addEventListener('keyup', function() {
+          filterTable();
+      });
+
+      function filterTable() {
+          const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+          const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+          const table = document.getElementById('ticketsTable');
+          const tbody = table.querySelector('tbody');
+          const rows = tbody.querySelectorAll('tr[data-status]');
+          
+          rows.forEach(row => {
+              const status = row.getAttribute('data-status');
+              const rowText = row.textContent.toLowerCase();
+              
+              const statusMatch = !statusFilter || status === statusFilter;
+              const searchMatch = !searchTerm || rowText.includes(searchTerm);
+              
+              if (statusMatch && searchMatch) {
+                  row.style.display = '';
+              } else {
+                  row.style.display = 'none';
+              }
+          });
       }
     </script>
   </body>

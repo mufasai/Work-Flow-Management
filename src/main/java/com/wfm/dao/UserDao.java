@@ -117,4 +117,33 @@ public class UserDao {
 
         return null;
     }
+
+    /**
+     * Method untuk mendapatkan users berdasarkan role
+     */
+    public static List<User> getUsersByRole(String role) {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM users WHERE role = ? ORDER BY username ASC";
+
+        try (Connection conn = DatabaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, role);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setRole(rs.getString("role"));
+                    user.setCreatedAt(rs.getTimestamp("created_at"));
+                    users.add(user);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
 }

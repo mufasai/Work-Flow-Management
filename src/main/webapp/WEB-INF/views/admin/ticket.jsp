@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
 prefix="c" uri="jakarta.tags.core" %> <%@ taglib prefix="fn"
-uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"
-%>
+uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <!DOCTYPE html>
 <html lang="id">
   <head>
@@ -275,43 +274,46 @@ uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createTicketModalLabel">
+                    <h5 class="modal-title" id="createTicketModalLabel" style="color: black;">
                         <i class="fas fa-plus-circle me-2"></i>Create New Ticket
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="createTicketForm">
+                <form id="createTicketForm" method="post">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="createTitle" class="form-label">Title <span class="text-danger">*</span></label>
+                                    <label for="createTitle" class="form-label" style="color: black;">Title <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="createTitle" name="title" required maxlength="255">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="createAssignTo" class="form-label">Assign To</label>
+                                    <label for="createAssignTo" class="form-label" style="color: black;">Assign To</label>
                                     <select class="form-select" id="createAssignTo" name="assignTo">
                                         <option value="">Select Technician</option>
-                                        <!-- Options will be loaded dynamically -->
+                                        <!-- Populate technicians from server-side -->
+                                        <c:forEach var="technician" items="${technicians}">
+                                            <option value="${technician.id}">${technician.username}</option>
+                                        </c:forEach>
                                     </select>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="createDescription" class="form-label">Description <span class="text-danger">*</span></label>
+                            <label for="createDescription" class="form-label" style="color: black;">Description <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="createDescription" name="description" rows="4" required maxlength="1000"></textarea>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="createAddress" class="form-label">Address</label>
+                            <label for="createAddress" class="form-label" style="color: black;">Address</label>
                             <textarea class="form-control" id="createAddress" name="address" rows="2" maxlength="500"></textarea>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="createMaps" class="form-label">Maps URL</label>
+                            <label for="createMaps" class="form-label" style="color: black;">Maps URL</label>
                             <input type="url" class="form-control" id="createMaps" name="maps" placeholder="https://maps.google.com/...">
                         </div>
                     </div>
@@ -783,6 +785,79 @@ uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"
                     showAlert('danger', 'An error occurred while deleting the ticket');
                 });
             }
+        }
+        $(document).ready(function() {
+    
+            // Load technicians when create modal is opened
+            $('#createTicketModal').on('show.bs.modal', function () {
+                loadTechnicians();
+            });
+            
+            // Handle create ticket form submission
+            $('#createTicketForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const formData = $(this).serialize(); 
+
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/admin/ticket',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            $('#createTicketModal').modal('hide');
+                            $('#createTicketForm')[0].reset();
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message || 'Failed to create ticket'
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error creating ticket:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred while creating the ticket'
+                        });
+                    }
+                });
+            });
+
+        });
+
+        // Function to load technicians for the dropdown
+        function loadTechnicians() {
+            $.ajax({
+                url: '${pageContext.request.contextPath}/admin/user', // You'll need this endpoint
+                type: 'GET',
+                data: { action: 'getTechnicians' },
+                success: function(response) {
+                    const select = $('#createAssignTo');
+                    select.empty().append('<option value="">Select Technician</option>');
+                    
+                    if (response.success && response.technicians) {
+                        response.technicians.forEach(function(tech) {
+                            select.append(`<option value="${tech.id}">${tech.username}</option>`);
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading technicians:', error);
+                }
+            });
         }
         
     </script>
