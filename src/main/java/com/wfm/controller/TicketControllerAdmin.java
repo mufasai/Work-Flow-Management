@@ -29,6 +29,13 @@ public class TicketControllerAdmin extends HttpServlet {
             User user = (User) session.getAttribute("user");
 
             if ("admin".equals(user.getRole())) {
+                // Handle AJAX request untuk view ticket
+                String action = req.getParameter("action");
+                if ("view".equals(action)) {
+                    handleViewTicket(req, resp);
+                    return;
+                }
+
                 try {
                     // === DATA TICKETS ===
                     List<Ticket> tickets = TicketDao.getAllTickets();
@@ -70,13 +77,13 @@ public class TicketControllerAdmin extends HttpServlet {
                     req.setAttribute("totalUsers", 0);
                 }
 
-                // Forward ke halaman ticket technician
+                // Forward ke halaman ticket admin
                 req.getRequestDispatcher("/WEB-INF/views/admin/ticket.jsp").forward(req, resp);
                 return;
             }
         }
 
-        // Jika belum login atau bukan technician, redirect ke halaman login
+        // Jika belum login atau bukan admin, redirect ke halaman login
         resp.sendRedirect(req.getContextPath() + "/login");
     }
 

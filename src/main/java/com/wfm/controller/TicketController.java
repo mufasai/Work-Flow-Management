@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.wfm.dao.TicketDao;
 import com.wfm.dao.TicketDao.TicketStatistics;
+import com.wfm.dao.UserDao;
 import com.wfm.model.Ticket;
 import com.wfm.model.User;
 
@@ -34,6 +35,10 @@ public class TicketController extends HttpServlet {
 
                     List<Ticket> tickets = TicketDao.getTicketsByAssignTo(technicianId);
                     req.setAttribute("tickets", tickets);
+
+                    // === LOAD TECHNICIANS FOR DROPDOWN ===
+                    List<User> technicians = UserDao.getUsersByRole("technician");
+                    req.setAttribute("technicians", technicians);
 
                     // PERBAIKAN 3: TICKET STATISTICS - Gunakan technicianId yang benar
                     TicketStatistics ticketStats = TicketDao.getTicketStatisticsByTechnician(technicianId);
@@ -119,13 +124,106 @@ public class TicketController extends HttpServlet {
 
     private void handleUpdateTicket(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // Implementation for updating ticket
-        String ticketId = req.getParameter("ticketId");
-        String status = req.getParameter("status");
-        resp.getWriter().write("{\"status\":\"success\",\"message\":\"Updated ticket " + ticketId + " to " + status + "\"}");
+
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.setContentType("application/json");
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Unauthorized\"}");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        String ticketIdStr = req.getParameter("ticketId");
+        String newStatus = req.getParameter("status");
+
+        // Validasi input
+        if (ticketIdStr == null || ticketIdStr.trim().isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setContentType("application/json");
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Ticket ID is required\"}");
+            return;
+        }
+
+        if (newStatus == null || newStatus.trim().isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setContentType("application/json");
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Status is required\"}");
+            return;
+        }
+
+        // Validasi status yang diizinkan
+        String[] allowedStatuses = {"open", "assigned", "in_progress", "done", "approved"};
+        boolean isValidStatus = false;
+        for (String status : allowedStatuses) {
+            if (status.equals(newStatus)) {
+                isValidStatus = true;
+                break;
+            }
+        }
+
+        if (!isValidStatus) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setContentType("application/json");
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Invalid status value\"}");
+            return;
+        }
+
+        try {
+            int ticketId = Integer.parseInt(ticketIdStr);
+
+            // Verifikasi ticket exists
+            Ticket ticket = TicketDao.getTicketById(ticketId);
+            if (ticket == null) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"status\":\"error\",\"message\":\"Ticket not found\"}");
+                return;
+            }
+
+            // Untuk technician, hanya bisa update tickets yang di-assign ke mereka
+            if ("technician".equals(user.getRole())) {
+                if (ticket.getAssignTo() == null || !String.valueOf(user.getId()).equals(ticket.getAssignTo())) {
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    resp.setContentType("application/json");
+                    resp.getWriter().write("{\"status\":\"error\",\"message\":\"You can only update tickets assigned to you\"}");
+                    return;
+                }
+
+                // Technician hanya bisa update dari in_progress ke done
+                if (!"in_progress".equals(ticket.getStatus()) || !"done".equals(newStatus)) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.setContentType("application/json");
+                    resp.getWriter().write("{\"status\":\"error\",\"message\":\"You can only update in_progress tickets to done\"}");
+                    return;
+                }
+            }
+
+            // Update status ticket
+            boolean success = TicketDao.updateTicketStatus(ticketId, newStatus);
+
+            if (success) {
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"status\":\"success\",\"message\":\"Ticket status updated successfully\"}");
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"status\":\"error\",\"message\":\"Failed to update ticket status\"}");
+            }
+
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setContentType("application/json");
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Invalid ticket ID format\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.setContentType("application/json");
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Internal server error: " + e.getMessage() + "\"}");
+        }
     }
 
-    // NEW METHOD: Handle Accept Ticket
+    //Handle Accept Ticket
     private void handleAcceptTicket(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -184,7 +282,7 @@ public class TicketController extends HttpServlet {
         }
     }
 
-    // NEW METHOD: Handle Decline Ticket
+    // Handle Decline Ticket
     private void handleDeclineTicket(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 

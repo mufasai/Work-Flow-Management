@@ -249,9 +249,9 @@
                                           onclick="viewTicket('${ticket.id}')">
                                     <i class="fas fa-eye"></i>
                                   </button>
-                                  <button type="button" class="btn btn-outline-success" title="Edit Ticket"
-                                          onclick="editTicket('${ticket.id}')">
-                                    <i class="fas fa-edit"></i>
+                                  <button type="button" class="btn btn-outline-warning" title="Mark as Done"
+                                          onclick="editTicket('${ticket.id}', '${ticket.status}')">
+                                    <i class="fas fa-check-circle"></i>
                                   </button>
                                   <c:if test="${not empty ticket.maps}">
                                     <button type="button" class="btn btn-outline-info" title="View Location"
@@ -304,15 +304,15 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="declineModalLabel">Decline Ticket</h5>
+                    <h5 class="modal-title" id="declineModalLabel" style="color: black;">Decline Ticket</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                     <div class="mb-3">
-                      <label class="form-label"><strong>Ticket:</strong> <span id="declineTicketTitle"></span></label>
+                      <label class="form-label" style="color: black;"><strong>Ticket:</strong> <span id="declineTicketTitle"></span></label>
                     </div>
                     <div class="mb-3">
-                      <label for="declineReason" class="form-label">Reason for declining:</label>
+                      <label for="declineReason" class="form-label" style="color: black;">Reason for declining:</label>
                       <textarea class="form-control" id="declineReason" rows="3" placeholder="Please provide a reason for declining this ticket..." required></textarea>
                     </div>
                   </div>
@@ -345,6 +345,51 @@
                     <span id="errorMessage"></span>
                   </div>
                   <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit Ticket Modal -->
+            <div class="modal fade" id="editTicketModal" tabindex="-1" aria-labelledby="editTicketModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="editTicketModalLabel" style="color: black;">
+                      <i class="fas fa-edit me-2"></i>Update Ticket Status
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form id="editTicketForm">
+                    <input type="hidden" id="editTicketId" name="ticketId">
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="editStatus" class="form-label" style="color: black;">New Status</label>
+                        <select class="form-select" id="editStatus" name="status" required>
+                          <option value="">Select Status</option>
+                          <option value="open">Open</option>
+                          <option value="assigned">Assigned</option>
+                          <option value="in_progress">In Progress</option>
+                          <option value="done">Done</option>
+                          <option value="approved">Approved</option>
+                        </select>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <label class="form-label" style="color: black;">Current Status</label>
+                        <div>
+                          <span id="currentStatusBadge" class="badge bg-secondary">-</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                      </button>
+                      <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-1"></i>Update Status
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -599,6 +644,182 @@
               }
           });
       }
+      // Fungsi untuk membuka modal edit dan mengisi data ticket
+      function editTicket(ticketId) {
+          // Fetch data ticket berdasarkan ID
+          fetch('${pageContext.request.contextPath}/admin/ticket?action=view&ticketId=' + ticketId, {
+              method: 'GET'
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success && data.ticket) {
+                  const ticket = data.ticket;
+                  
+                  // Isi form edit dengan data ticket
+                  document.getElementById('editTicketId').value = ticket.id;
+                  document.getElementById('editTitle').value = ticket.title || '';
+                  document.getElementById('editDescription').value = ticket.description || '';
+                  document.getElementById('editAddress').value = ticket.address || '';
+                  document.getElementById('editMaps').value = ticket.maps || '';
+                  
+                  // Set status dropdown
+                  const statusSelect = document.getElementById('editStatus');
+                  if (statusSelect) {
+                      statusSelect.value = ticket.status || 'open';
+                  }
+                  
+                  // Set assign to dropdown
+                  const assignSelect = document.getElementById('editAssignTo');
+                  if (assignSelect) {
+                      assignSelect.value = ticket.assignTo || '';
+                  }
+                  
+                  // Tampilkan modal
+                  const editModal = new bootstrap.Modal(document.getElementById('editTicketModal'));
+                  editModal.show();
+                  
+              } else {
+                  showAlert('danger', data.message || 'Failed to load ticket data');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              showAlert('danger', 'An error occurred while loading ticket data');
+          });
+      }
+
+      // Fungsi untuk handle submit form edit ticket
+      // Function untuk membuka modal edit
+      function editTicket(ticketId, currentStatus) {
+        // Set values
+        document.getElementById('editTicketId').value = ticketId;
+        document.getElementById('editStatus').value = '';
+        
+        // Update current status badge
+        const badge = document.getElementById('currentStatusBadge');
+        badge.textContent = currentStatus.replace('_', ' ').toUpperCase();
+        badge.className = 'badge ' + getStatusBadgeClass(currentStatus);
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editTicketModal'));
+        modal.show();
+      }
+
+      // Function untuk class badge
+      function getStatusBadgeClass(status) {
+        switch(status) {
+          case 'open': return 'bg-primary';
+          case 'assigned': return 'bg-warning';
+          case 'in_progress': return 'bg-info';
+          case 'done': return 'bg-success';
+          case 'approved': return 'bg-dark';
+          default: return 'bg-secondary';
+        }
+      }
+
+      // Handle form submit
+      document.getElementById('editTicketForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        formData.append('action', 'update');
+        
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Updating...';
+        
+        fetch(window.location.pathname, {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            // Success
+            alert('Ticket status updated successfully!');
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editTicketModal'));
+            modal.hide();
+            
+            // Reload page
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          } else {
+            // Error
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while updating the ticket');
+        })
+        .finally(() => {
+          // Reset button
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        });
+      });
+
+      // Reset form when modal closes
+      document.getElementById('editTicketModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('editTicketForm').reset();
+      });
+          e.preventDefault();
+          
+          const formData = new FormData(e.target);
+          formData.append('action', 'update');
+
+          fetch('${pageContext.request.contextPath}/admin/ticket', {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  showAlert('success', data.message);
+                  bootstrap.Modal.getInstance(document.getElementById('editTicketModal')).hide();
+                  setTimeout(() => location.reload(), 1000);
+              } else {
+                  showAlert('danger', data.message);
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              showAlert('danger', 'An error occurred while updating the ticket');
+          });
+      
+
+      // Fungsi untuk menampilkan alert (jika belum ada)
+      function showAlert(type, message) {
+          // Remove existing alerts
+          const existingAlerts = document.querySelectorAll('.alert');
+          existingAlerts.forEach(alert => alert.remove());
+          
+          // Create new alert
+          const alertDiv = document.createElement('div');
+          alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+          alertDiv.innerHTML = `
+              ${message}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          
+          // Insert alert at the top of the main content
+          const mainContent = document.querySelector('.container-fluid') || document.body;
+          mainContent.insertBefore(alertDiv, mainContent.firstChild);
+          
+          // Auto remove after 5 seconds
+          setTimeout(() => {
+              if (alertDiv.parentNode) {
+                  alertDiv.remove();
+              }
+          }, 5000);
+      }
     </script>
+
   </body>
 </html>

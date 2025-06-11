@@ -41,12 +41,11 @@ uri="jakarta.tags.functions" %>
             <i class="fas fa-user-circle me-2" style="color: #64ffda"></i>
             Technician ${user.username}
           </span>
-          <button
-            href="${pageContext.request.contextPath}/login"
-            class="btn btn-logout"
-          >
-            <i class="fas fa-sign-out-alt me-2"></i>Logout
-          </button>
+          <a href="${pageContext.request.contextPath}/login">
+            <button class="btn btn-logout">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </button>
+          </a>
         </div>
       </div>
     </nav>

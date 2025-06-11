@@ -293,7 +293,6 @@ uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
                                     <label for="createAssignTo" class="form-label" style="color: black;">Assign To</label>
                                     <select class="form-select" id="createAssignTo" name="assignTo">
                                         <option value="">Select Technician</option>
-                                        <!-- Populate technicians from server-side -->
                                         <c:forEach var="technician" items="${technicians}">
                                             <option value="${technician.id}">${technician.username}</option>
                                         </c:forEach>
@@ -335,8 +334,8 @@ uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editTicketModalLabel">
-                        <i class="fas fa-edit me-2"></i>Edit Ticket
+                    <h5 class="modal-title" id="editTicketModalLabel" style="color: black;">
+                        <i class="fas fa-edit me-2" style="color: black;"></i>Edit Ticket
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -346,13 +345,13 @@ uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="editTitle" class="form-label">Title <span class="text-danger">*</span></label>
+                                    <label for="editTitle" class="form-label" style="color: black;">Title <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="editTitle" name="title" required maxlength="255">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="editStatus" class="form-label">Status</label>
+                                    <label for="editStatus" class="form-label" style="color: black;">Status</label>
                                     <select class="form-select" id="editStatus" name="status">
                                         <option value="open">Open</option>
                                         <option value="assigned">Assigned</option>
@@ -365,25 +364,28 @@ uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="editAssignTo" class="form-label">Assign To</label>
+                            <label for="editAssignTo" class="form-label" style="color: black;">Assign To</label>
                             <select class="form-select" id="editAssignTo" name="assignTo">
                                 <option value="">Select Technician</option>
                                 <!-- Options will be loaded dynamically -->
+                                <c:forEach var="technician" items="${technicians}">
+                                    <option value="${technician.id}">${technician.username}</option>
+                                </c:forEach>
                             </select>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="editDescription" class="form-label">Description <span class="text-danger">*</span></label>
+                            <label for="editDescription" class="form-label" style="color: black;">Description <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="editDescription" name="description" rows="4" required maxlength="1000"></textarea>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="editAddress" class="form-label">Address</label>
+                            <label for="editAddress" class="form-label" style="color: black;">Address</label>
                             <textarea class="form-control" id="editAddress" name="address" rows="2" maxlength="500"></textarea>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="editMaps" class="form-label">Maps URL</label>
+                            <label for="editMaps" class="form-label" style="color: black;">Maps URL</label>
                             <input type="url" class="form-control" id="editMaps" name="maps" placeholder="https://maps.google.com/...">
                         </div>
                     </div>
@@ -676,32 +678,51 @@ uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
             });
         }
 
+        // Fungsi untuk membuka modal edit dan mengisi data ticket
         function editTicket(ticketId) {
-            fetch('${pageContext.request.contextPath}/admin/ticket?action=view&ticketId=' + ticketId)
+            // Fetch data ticket berdasarkan ID
+            fetch('${pageContext.request.contextPath}/admin/ticket?action=view&ticketId=' + ticketId, {
+                method: 'GET'
+            })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
+                if (data.success && data.ticket) {
                     const ticket = data.ticket;
                     
+                    // Isi form edit dengan data ticket
                     document.getElementById('editTicketId').value = ticket.id;
-                    document.getElementById('editTitle').value = ticket.title;
-                    document.getElementById('editDescription').value = ticket.description;
-                    document.getElementById('editStatus').value = ticket.status;
-                    document.getElementById('editAssignTo').value = ticket.assignTo || '';
+                    document.getElementById('editTitle').value = ticket.title || '';
+                    document.getElementById('editDescription').value = ticket.description || '';
                     document.getElementById('editAddress').value = ticket.address || '';
                     document.getElementById('editMaps').value = ticket.maps || '';
                     
-                    new bootstrap.Modal(document.getElementById('editTicketModal')).show();
+                    // Set status dropdown
+                    const statusSelect = document.getElementById('editStatus');
+                    if (statusSelect) {
+                        statusSelect.value = ticket.status || 'open';
+                    }
+                    
+                    // Set assign to dropdown
+                    const assignSelect = document.getElementById('editAssignTo');
+                    if (assignSelect) {
+                        assignSelect.value = ticket.assignTo || '';
+                    }
+                    
+                    // Tampilkan modal
+                    const editModal = new bootstrap.Modal(document.getElementById('editTicketModal'));
+                    editModal.show();
+                    
                 } else {
-                    showAlert('danger', data.message);
+                    showAlert('danger', data.message || 'Failed to load ticket data');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showAlert('danger', 'Failed to load ticket details');
+                showAlert('danger', 'An error occurred while loading ticket data');
             });
         }
 
+        // Fungsi untuk handle submit form edit ticket
         function handleEditTicket(e) {
             e.preventDefault();
             
@@ -727,6 +748,56 @@ uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
                 showAlert('danger', 'An error occurred while updating the ticket');
             });
         }
+
+        // Fungsi untuk menampilkan alert (jika belum ada)
+        function showAlert(type, message) {
+            // Remove existing alerts
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            // Create new alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Insert alert at the top of the main content
+            const mainContent = document.querySelector('.container-fluid') || document.body;
+            mainContent.insertBefore(alertDiv, mainContent.firstChild);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+        
+        // Inisialisasi setelah DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tambahkan event listener untuk form edit ticket
+            const editTicketForm = document.getElementById('editTicketForm');
+            if (editTicketForm) {
+                editTicketForm.addEventListener('submit', handleEditTicket);
+            }
+            
+            // Event listener untuk reset form ketika modal ditutup
+            const editTicketModal = document.getElementById('editTicketModal');
+            if (editTicketModal) {
+                editTicketModal.addEventListener('hidden.bs.modal', function() {
+                    // Reset form
+                    document.getElementById('editTicketForm').reset();
+                    
+                    // Clear validation states
+                    const formElements = editTicketForm.querySelectorAll('.form-control, .form-select');
+                    formElements.forEach(element => {
+                        element.classList.remove('is-valid', 'is-invalid');
+                    });
+                });
+            }
+        });
 
         function viewTicket(ticketId) {
             fetch('${pageContext.request.contextPath}/admin/ticket?action=view&ticketId=' + ticketId)
@@ -786,6 +857,8 @@ uri="jakarta.tags.functions" %> <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
                 });
             }
         }
+        
+        // create ticket modal script
         $(document).ready(function() {
     
             // Load technicians when create modal is opened
